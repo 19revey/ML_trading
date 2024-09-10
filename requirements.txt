@@ -1,9 +1,10 @@
-pandas
+stable_baselines3
 numpy
-seaborn
+pandas
 matplotlib
-scikit-learn
-# catboost
-xgboost
-dill
-Flask
+torch
+alpaca-py
+
+gymnasium
+gym_anytrading
+finrl

@@ -1,0 +1,8 @@
+config*
+*ipynb
+logs/
+artifacts/
+__pycache__/
+notebook/
+*png
+template.py
