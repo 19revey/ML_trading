@@ -8,7 +8,7 @@ from trader_bot.utils.logger import logging
 from trader_bot.config import DATA_SAVE_DIR, ALPACA_CONFIG
 from trader_bot.config import SELECT_TICKER, INDICATORS
 
-from datetime import datetime
+
 from lumibot.backtesting import YahooDataBacktesting,PolygonDataBacktesting,BacktestingBroker
 from lumibot.brokers import Alpaca
 from lumibot.strategies import Strategy
@@ -16,6 +16,13 @@ from lumibot.traders import Trader
 import pandas as pd
 from finta import TA
 import alpaca_trade_api as tradeapi
+from alpaca.data import StockHistoricalDataClient
+from alpaca.data.requests import StockBarsRequest
+
+
+from alpaca.data.timeframe import TimeFrame
+from datetime import datetime
+import random
 
 class DataIngestion:
 
@@ -32,6 +39,7 @@ class DataIngestion:
         self.shift = shift
 
         self.api = tradeapi.REST(ALPACA_CONFIG['API_KEY'],ALPACA_CONFIG['API_SECRET'],ALPACA_CONFIG['API_BASE_URL'], "v2")
+        self.client = StockHistoricalDataClient(ALPACA_CONFIG['API_KEY'], ALPACA_CONFIG['API_SECRET'])
 
         alpaca = Alpaca(ALPACA_CONFIG)
         logging.info("Alpaca account is now connected")
@@ -48,7 +56,9 @@ class DataIngestion:
             data_df = pd.concat([data_df, barset])
         self.data_raw = data_df
         return data_df
+    
     def _download_individual_tic_with_indicators(self,tic, length, interval, shift):
+
         barset = self.alpaca_stragegy.get_historical_prices(tic, length, interval, shift).df.drop(columns=['return'])
         barset["tic"] = tic
         # barset["SMA"] = TA.SMA(barset,2)
@@ -56,17 +66,51 @@ class DataIngestion:
         barset.fillna(0, inplace=True)
         return barset
     
+    def _download_raw_alpaca(self,tic_list):
+        request_params = StockBarsRequest(
+            symbol_or_symbols=tic_list,  # You can specify multiple symbols
+            timeframe=TimeFrame.Minute,
+            start=datetime(2024, 9, 1,0,0,0),  # Start date
+            end=datetime(2024, 9, 10,0,0,0)     # End date
+        )
+        barset = self.client.get_stock_bars(request_params).df
+        barset = barset.reset_index()
+        barset.rename(columns={'symbol': 'tic'}, inplace=True)
+        self.data_raw = barset
+        return barset
+        
+    
     def _clean_data(self,data):
+
+        desired_tic = 'SPY'
+
+        # Sort by tic, prioritizing the desired tic first
+        data['tic_order'] = data['tic'].apply(lambda x: 0 if x == desired_tic else 1)
+
+        # Sort by the custom tic_order first, then by tic and timestamp
+        data.sort_values(['tic_order', 'tic', 'timestamp'], inplace=True)
+
+        # Drop the auxiliary tic_order column if no longer needed
+        data.drop('tic_order', axis=1, inplace=True)
+
+
+        # start_time = data.timestamp.min()
+        # end_time = data.timestamp.max()
+
+        # data.sort_values(['tic','timestamp'],inplace=True)
         stacked_df = (
             data.set_index(['timestamp', data.groupby('timestamp').cumcount()])
             .unstack()
             .sort_index(axis=1, level=1)
             )
+        # stacked_df = stacked_df[(stacked_df != 0).all(axis=1)]
+        stacked_df.dropna(inplace=True)
         stacked_df.columns = [f"{col[0]}_{col[1]+1}" if col[1] > 0 else col[0] for col in stacked_df.columns]
         return stacked_df
 
     def get_data(self,save=False):
-        data_raw = self._download_raw(self.ticker_list, self.length, self.interval, self.shift)
+        # data_raw = self._download_raw(self.ticker_list, self.length, self.interval, self.shift)
+        data_raw = self._download_raw_alpaca(self.ticker_list)
         self.clean_data= self._clean_data( data_raw )
 
         if save:
@@ -116,10 +160,10 @@ class DataIngestion:
             'n': 'trade_count'
         }
         df.columns = [alias[c] for c in df.columns]
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'])+ pd.Timedelta(seconds=random.randrange(1, 60))
 
         df.reset_index(drop=True)
-        df.to_csv(self.path_test, index=False)
+        # df.to_csv(self.path_test, index=False)
         return df
     
 
@@ -130,33 +174,45 @@ class DataIngestion:
         #     self.df = last_bar
         # else:
         self.df = pd.concat([self.df, last_bar],axis=0, ignore_index=True)
-
-        clean_data= self._clean_data(self.df)
+        if self.df.shape[0] > 500:
+            self.df = self.df.iloc[-500:,:]
+        # logging.info(f"Latest data: {self.df} ")
+        self.clean_data= self._clean_data(self.df)
         # clean_data=  clean_data.iloc[:,1:]
-        clean_data.fillna(0,inplace=True)
-        clean_data.reset_index(drop=True)
-        logging.info(f"Latest data shape: {clean_data.shape} ")
-        clean_data.to_csv(self.path_test, index=True)
+        self.clean_data.fillna(0,inplace=True)
+        self.clean_data.reset_index(drop=True)
+        # logging.info(f"Latest data after clean: {clean_data} ")
         
-        if self.df.shape[0] > 100:
-            self.df = self.df.iloc[-100:]
-        return clean_data
+        self.clean_data.to_csv(self.path_test, index=True)
+        
+        if self.clean_data.shape[0] > 100:
+            self.clean_data = self.clean_data.iloc[-100:,:]
+        return self.clean_data
 
-    # def get_state(self):
-    #     clean_data= self._clean_data(self.df)
-    #     # clean_data=  clean_data.iloc[:,1:]
-    #     clean_data.fillna(0,inplace=True)
-    #     clean_data.reset_index(drop=True)
-    #     logging.info(f"Latest data shape: {clean_data.shape} ")
-    #     clean_data.to_csv(self.path_test, index=True)      
-    #     return clean_data  
+
     
 if __name__ == "__main__":
     
-    data = DataIngestion(ticker_list = ["SPY","AAPL","NVDA"], length=1*100, interval = 'minute',shift = pd.Timedelta(days=0,hours=10,minutes=3,seconds=0))
+    data = DataIngestion(ticker_list = ["SPY","AAPL","NVDA"], length=24*60, interval = 'minute',shift = pd.Timedelta(days=0,hours=0,minutes=0,seconds=0))
     # data.get_data(save=True)
     print(data.get_data(save=True).shape)
+    data.get_state()
+    data.get_state()
+    data.get_state()
+
     # data.get_state()
     # data.get_state()
-    # print(data.get_state())
+    state = data.get_state()
+    # state = state.iloc[-1:,:]
+    print(state)
+
+    # patterns = ['macd', 'boll', 'rsi','low','volume']
+    # # Combine patterns into a single regular expression
+    # regex_pattern = '|'.join(patterns)
+    # # Filter columns based on the combined pattern
+    # regex_pattern = '^(' + '|'.join(patterns) + ')'
+    # # Filter columns based on the combined pattern
+    # selected_columns = state.filter(regex=regex_pattern)
+
+    # print(f"!latest state: {selected_columns.shape}")
     
