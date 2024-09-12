@@ -84,21 +84,6 @@ class RLStrategy(Strategy):
         self.cancel_open_orders()
 
 
-
-class BuyHold(Strategy):
-
-    def initialize(self):
-        self.sleeptime = "1M"
-
-    def on_trading_iteration(self):
-        if self.first_iteration:
-            symbol = "SPY"
-            price = self.get_last_price(symbol)
-            print(f"Buying {symbol} at {price}")
-            quantity = self.cash // price
-            order = self.create_order(symbol, quantity, "buy")
-            self.submit_order(order)
-
 if __name__ == "__main__":
 
 

@@ -6,45 +6,6 @@ from enum import Enum
 import numpy as np
 
 
-def add_signals(env):
-    start = env.frame_bound[0]-env.window_size
-    end = env.frame_bound[1]
-    prices = env.df.loc[:,'low'].to_numpy()[start:end]
-    # signal_features = env.df.loc[:,['low','volume','SMA','RSI','OBV']].to_numpy()[start:end]
-
-
-    patterns = ['macd', 'boll', 'rsi','low','volume']
-    # Combine patterns into a single regular expression
-    regex_pattern = '|'.join(patterns)
-    # Filter columns based on the combined pattern
-    regex_pattern = '^(' + '|'.join(patterns) + ')'
-    # Filter columns based on the combined pattern
-    selected_columns = env.df.filter(regex=regex_pattern)
-    logging.info(f"Load data with selected features: {selected_columns.columns}")
-    
-
-    # ['Close','volume','close_14_sma',	'close_30_sma',	'close_7_sma','rsi_30'	]
-    signal_features = selected_columns.to_numpy()[start:end]
-    return prices,signal_features
-
-def custom_update_profit(env, action):
-    trade = False
-    if (
-        (action == Actions.Buy.value and env._position == Positions.Short) or
-        (action == Actions.Sell.value and env._position == Positions.Long)
-    ):
-        trade = True
-
-    if trade or env._truncated:
-        current_price = env.prices[env._current_tick]
-        last_trade_price = env.prices[env._last_trade_tick]
-
-
-        if env._position == Positions.Long:
-            shares = (env._total_profit * (1 - env.trade_fee_ask_percent)) / last_trade_price
-            env._total_profit = (shares * (1 - env.trade_fee_bid_percent)) * current_price
-
-
 class StockEnvironment(TradingEnv):
 
     def __init__(self, df, window_size, frame_bound, render_mode=None):
@@ -143,6 +104,47 @@ class StockEnvironment(TradingEnv):
             last_trade_tick = current_tick - 1
 
         return profit
+
+
+
+def add_signals(env):
+    start = env.frame_bound[0]-env.window_size
+    end = env.frame_bound[1]
+    prices = env.df.loc[:,'low'].to_numpy()[start:end]
+    # signal_features = env.df.loc[:,['low','volume','SMA','RSI','OBV']].to_numpy()[start:end]
+
+
+    patterns = ['macd', 'boll', 'rsi','low','volume']
+    # Combine patterns into a single regular expression
+    regex_pattern = '|'.join(patterns)
+    # Filter columns based on the combined pattern
+    regex_pattern = '^(' + '|'.join(patterns) + ')'
+    # Filter columns based on the combined pattern
+    selected_columns = env.df.filter(regex=regex_pattern)
+    logging.info(f"Load data with selected features: {selected_columns.columns}")
+    
+
+    # ['Close','volume','close_14_sma',	'close_30_sma',	'close_7_sma','rsi_30'	]
+    signal_features = selected_columns.to_numpy()[start:end]
+    return prices,signal_features
+
+def custom_update_profit(env, action):
+    trade = False
+    if (
+        (action == Actions.Buy.value and env._position == Positions.Short) or
+        (action == Actions.Sell.value and env._position == Positions.Long)
+    ):
+        trade = True
+
+    if trade or env._truncated:
+        current_price = env.prices[env._current_tick]
+        last_trade_price = env.prices[env._last_trade_tick]
+
+
+        if env._position == Positions.Long:
+            shares = (env._total_profit * (1 - env.trade_fee_ask_percent)) / last_trade_price
+            env._total_profit = (shares * (1 - env.trade_fee_bid_percent)) * current_price
+
 
 class StockEnvironment1(StocksEnv):
     _process_data = add_signals
