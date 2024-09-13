@@ -1,0 +1,25 @@
+artifacts_root: artifacts
+
+data:
+  tic_list: ['SPY', 'XOP','AAPL','NVDA']
+  interval: 1Min
+  start_date: 2024-09-01
+  end_date: 2024-09-12
+  save_raw_data: True
+  save_processed_data: True
+  save_stream_data: True
+
+  raw_data_file: artifacts/datasets/raw_data.csv
+  processed_data_file: artifacts/datasets/processed_data.csv
+  stream_data_file: artifacts/datasets/stream_data.csv
+
+model:
+  model_file: artifacts/trained_model/model.zip
+  lookback: 2
+  time_steps: 1000
+  
+
+
+
+
+

@@ -1,9 +1,21 @@
-pandas
+stable_baselines3
 numpy
-seaborn
+pandas
 matplotlib
-scikit-learn
-# catboost
-xgboost
-dill
-Flask
+torch
+python-dotenv
+
+gymnasium
+gym_anytrading
+finrl
+finta
+alpaca-py
+alpaca_trade_api
+
+python-box
+ensure
+mlflow
+dagshub
+lumibot
+
+# -e .

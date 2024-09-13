@@ -1,0 +1,32 @@
+name: ai_trader
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+
+jobs:
+  automated_trading:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Docker
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      # Step 3: Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t ai_trader .
+
+      # Step 4: Run the container (if GPU is required, you can add optional GPU support here)
+      - name: Run AI Trader
+        run: |
+          docker run --gpus all -p 8501:8501 -v $(pwd):/app ai_trader /bin/sh -c "cd /app && python main.py"
+

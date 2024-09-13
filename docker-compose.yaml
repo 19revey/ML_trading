@@ -1,0 +1,15 @@
+services:
+  automated_trading:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+
+    # entrypoint: ["/bin/sh", "-c", "cd /app && python trading.py"]
+    entrypoint: ["/bin/sh", "-c", "cd /app && python main.py"]
+    # stdin_open: true
+
