@@ -1,4 +1,3 @@
-config*
 *ipynb
 logs/
 artifacts
@@ -8,3 +7,4 @@ notebook/
 template.py
 *env
 *egg-info
+mlruns

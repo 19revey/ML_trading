@@ -3,6 +3,7 @@ numpy
 pandas
 matplotlib
 torch
+python-dotenv
 
 gymnasium
 gym_anytrading
@@ -14,6 +15,7 @@ alpaca_trade_api
 python-box
 ensure
 mlflow
+dagshub
 lumibot
 
 # -e .

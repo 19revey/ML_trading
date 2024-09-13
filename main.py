@@ -1,6 +1,6 @@
 from trader.utils.logger import logging
 
-from trader.pipeline.stage_04_deploy_model import ModelDeplyPipeline
+from trader.pipeline.deploy_model import ModelDeplyPipeline
 
 STAGE_NAME = "Model deploy stage"
 

@@ -10,6 +10,7 @@ from stable_baselines3 import PPO
 import matplotlib.pyplot as plt
 
 import mlflow
+import dagshub
 
 
 from trader.config import ConfigManager
@@ -18,6 +19,7 @@ class Evaluation:
     def __init__(self,config: ConfigManager):
         self.data_config = config.get_data_config()
         self.model_config = config.get_model_config()
+        dagshub.init(repo_owner='me1402utsa', repo_name='ML_trading', mlflow=True)
 
     def eval(self):
 
@@ -38,9 +40,10 @@ class Evaluation:
             logging.info("Model not found")
             raise Exception("Model not found")
         
-        self.rl_eval(env,model)
-        self.buy_hold_eval(env)
-        self.random_eval(env)
+        with mlflow.start_run():
+            self.rl_eval(env,model)
+            self.buy_hold_eval(env)
+            self.random_eval(env)
 
     def rl_eval(self,env,model):
         observation,_ = env.reset()
@@ -52,10 +55,19 @@ class Evaluation:
         print(f"RL optimized {info['total_profit']}, Reward {info['total_reward']}")
         print(f"Max possible profit: {env.max_possible_profit()}")
 
+        mlflow.log_metric("rl_profit",info['total_profit'])
+
+        
         plt.figure(figsize=(15,6))
         plt.cla()
         env.render_all()
-        plt.savefig("test.png")
+        plt_path = "artifacts/plots/test.png"
+        os.makedirs(os.path.dirname(plt_path),exist_ok=True)
+        plt.savefig(plt_path)
+        plt.close()
+        mlflow.log_artifact(plt_path)
+        mlflow.log_params(self.data_config.__dict__)
+        mlflow.log_params(self.model_config.__dict__)
 
     def buy_hold_eval(self,env):
         observation,_ = env.reset()
@@ -65,6 +77,7 @@ class Evaluation:
             if done:
                 break
         print(f"buy and hold profit: {info['total_profit']}, Reward {info['total_reward']}")
+        mlflow.log_metric("buy_hold_profit",info['total_profit'])
 
     def random_eval(self,env):
         observation,_ = env.reset()
@@ -74,3 +87,4 @@ class Evaluation:
             if done:
                 break
         print(f"Random profit: {info['total_profit']}, Reward {info['total_reward']}")
+        mlflow.log_metric("random_profit",info['total_profit'])

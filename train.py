@@ -1,8 +1,8 @@
 from trader.utils.logger import logging
 
-from trader.pipeline.stage_01_data_ingestion import DataIngestionPipeline
-from trader.pipeline.stage_02_model_trainer import ModelTrainerPipeline
-from trader.pipeline.stage_03_model_evaluation import ModelEvaluationPipeline
+from trader.pipeline.prepare_data import DataIngestionPipeline
+from trader.pipeline.train_model import ModelTrainerPipeline
+from trader.pipeline.evaluate_model import ModelEvaluationPipeline
 
 
 
