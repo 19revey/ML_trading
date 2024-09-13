@@ -1,9 +1,6 @@
-import pandas as pd
-import gymnasium as gym
 from gym_anytrading.envs import TradingEnv, Actions, Positions, StocksEnv
-from trader_bot.utils.logger import logging
-from enum import Enum
-import numpy as np
+from trader.utils.logger import logging
+
 
 
 class StockEnvironment(TradingEnv):

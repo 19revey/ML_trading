@@ -1,8 +1,10 @@
 config*
 *ipynb
 logs/
-artifacts/
+artifacts
 __pycache__/
 notebook/
 *png
 template.py
+*env
+*egg-info

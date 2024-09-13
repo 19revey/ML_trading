@@ -3,8 +3,17 @@ numpy
 pandas
 matplotlib
 torch
-alpaca-py
 
 gymnasium
 gym_anytrading
 finrl
+finta
+alpaca-py
+alpaca_trade_api
+
+python-box
+ensure
+mlflow
+lumibot
+
+# -e .
