@@ -9,8 +9,9 @@ on:
 
 jobs:
   automated_trading:
-    runs-on: ubuntu-latest
-
+    # runs-on: ubuntu-latest
+    runs-on: self-hosted
+    
     steps:
       # Step 1: Checkout the code from the repository
       - name: Checkout code
