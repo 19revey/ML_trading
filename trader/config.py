@@ -6,7 +6,7 @@ from alpaca.data.timeframe import TimeFrame
 
 from dotenv import load_dotenv
 import os
-
+ 
 @dataclass(frozen=True)
 class DATA_CONFIG:
     tic_list: list
