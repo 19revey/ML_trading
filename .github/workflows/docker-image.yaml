@@ -12,6 +12,12 @@ jobs:
     # runs-on: ubuntu-latest
     runs-on: self-hosted
 
+    env:
+      ALPACA_API_KEY : ${{secrets.ALPACA_API_KEY}}
+      ALPACA_SECRET_KEY : ${{secrets.ALPACA_SECRET_KEY}}
+      ALPACA_API_BASE_URL : ${{secrets.ALPACA_API_BASE_URL}}
+      ALPACA_PAPER : ${{secrets.ALPACA_PAPER}}
+
     steps:
       # Step 1: Checkout the code from the repository
       - name: Checkout code
@@ -30,12 +36,7 @@ jobs:
       - name: Run AI Trader
 
 
-        env:
-          ALPACA_API_KEY : ${{ secrets.ALPACA_API_KEY }}
-          ALPACA_SECRET_KEY : ${{ secrets.ALPACA_SECRET_KEY }}
-          ALPACA_API_BASE_URL : ${{ secrets.ALPACA_API_BASE_URL }}
-          ALPACA_PAPER : ${{ secrets.ALPACA_PAPER }}
-          
+
         run: |
           docker run --gpus all -p 8501:8501 -v $(pwd):/app ai_trader /bin/sh -c "cd /app && python main.py"
 
