@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 # LOG_FILE=f"{datetime.now().strftime('%m_%d_%Y_%H_%M_%S')}.log"
-LOG_FILE=f"lastrun.log"
+LOG_FILE="lastrun.log"
 LOG_FILE_PATH=os.path.join("artifacts","logs",LOG_FILE)
 
 # if os.path.exists(logs_path):
