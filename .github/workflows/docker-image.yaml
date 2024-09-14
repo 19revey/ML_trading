@@ -12,21 +12,38 @@ jobs:
     # runs-on: ubuntu-latest
     runs-on: self-hosted
 
-    steps:
+    env:
+      ALPACA_API_KEY : ${{secrets.ALPACA_API_KEY}}
+      ALPACA_API_SECRET : ${{secrets.ALPACA_API_SECRET}}
+      ALPACA_API_BASE_URL : ${{secrets.ALPACA_API_BASE_URL}}
+      ALPACA_PAPER : ${{secrets.ALPACA_PAPER}}
 
+    steps:
+      # Step 1: Checkout the code from the repository
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Write .env file
+      # Step 2: Set up Docker
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      # Step 3: Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t ai_trader .
+      # Step 4: write .env
+      - name: Write env file
         run: |
           echo "ALPACA_API_KEY=${ALPACA_API_KEY}" >> .env
           echo "ALPACA_SECRET_KEY=${ALPACA_API_SECRET}" >> .env
           echo "ALPACA_API_BASE_URL=${ALPACA_API_BASE_URL}" >> .env
           echo "ALPACA_PAPER=${ALPACA_PAPER}" >> .env
-
-      - name: Docker Compose Action
-        uses: hoverkraft-tech/compose-action@v2.0.1
-
-      - name: Run Docker Compose
+      # Step 5: Run the container (if GPU is required, you can add optional GPU support here)
+      - name: Run AI Trader
         run: |
-          docker-compose up -d --build            
+          docker run \
+          -e ALPACA_API_KEY=${ALPACA_API_KEY} \
+          -e ALPACA_API_SECRET=${ALPACA_API_SECRET} \
+          -e ALPACA_API_BASE_URL=${ALPACA_API_BASE_URL} \
+          -e ALPACA_PAPER=${ALPACA_PAPER} \
+          -p 8501:8501 -v $(pwd):/app ai_trader /bin/sh -c "cd /app && python main.py"
