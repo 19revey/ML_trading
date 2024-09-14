@@ -31,10 +31,15 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t ai_trader .
-
-      # Step 4: Run the container (if GPU is required, you can add optional GPU support here)
+      # Step 4: write .env
+      - name Write env file
+        run: |
+          echo "ALPACA_API_KEY=${ALPACA_API_KEY}" >> .env
+          echo "ALPACA_SECRET_KEY=${ALPACA_SECRET_KEY}" >> .env
+          echo "ALPACA_API_BASE_URL=${ALPACA_API_BASE_URL}" >> .env
+          echo "ALPACA_PAPER=${ALPACA_PAPER}" >> .env
+      # Step 5: Run the container (if GPU is required, you can add optional GPU support here)
       - name: Run AI Trader
         run: |
-          docker run -e ALPACA_API_KEY=$ALPACA_API_KEY -e ALPACA_SECRET_KEY=$ALPACA_SECRET_KEY -e ALPACA_API_BASE_URL=$ALPACA_API_BASE_URL -e ALPACA_PAPER=$ALPACA_PAPER \
-          --gpus all -p 8501:8501 -v $(pwd):/app ai_trader /bin/sh -c "cd /app && python main.py"
+          docker run --gpus all -p 8501:8501 -v $(pwd):/app ai_trader /bin/sh -c "cd /app && python main.py"
 
