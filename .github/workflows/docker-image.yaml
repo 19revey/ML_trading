@@ -10,9 +10,12 @@ on:
 jobs:
   automated_trading:
 <<<<<<< HEAD
+<<<<<<< HEAD
     runs-on: ubuntu-latest
 
 =======
+=======
+>>>>>>> main
     # runs-on: ubuntu-latest
     runs-on: self-hosted
     env:
@@ -20,6 +23,9 @@ jobs:
       ALPACA_SECRET_KEY : ${{ secrets.ALPACA_SECRET_KEY }}
       ALPACA_API_BASE_URL : ${{ secrets.ALPACA_API_BASE_URL }}
       ALPACA_PAPER : ${{ secrets.ALPACA_PAPER }}
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
     steps:
       # Step 1: Checkout the code from the repository
