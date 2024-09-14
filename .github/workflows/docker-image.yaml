@@ -14,7 +14,7 @@ jobs:
 
     env:
       ALPACA_API_KEY : ${{secrets.ALPACA_API_KEY}}
-      ALPACA_SECRET_KEY : ${{secrets.ALPACA_SECRET_KEY}}
+      ALPACA_API_SECRET : ${{secrets.ALPACA_API_SECRET}}
       ALPACA_API_BASE_URL : ${{secrets.ALPACA_API_BASE_URL}}
       ALPACA_PAPER : ${{secrets.ALPACA_PAPER}}
 
@@ -35,7 +35,7 @@ jobs:
       - name: Write env file
         run: |
           echo "ALPACA_API_KEY=${ALPACA_API_KEY}" >> .env
-          echo "ALPACA_SECRET_KEY=${ALPACA_SECRET_KEY}" >> .env
+          echo "ALPACA_SECRET_KEY=${ALPACA_API_SECRET}" >> .env
           echo "ALPACA_API_BASE_URL=${ALPACA_API_BASE_URL}" >> .env
           echo "ALPACA_PAPER=${ALPACA_PAPER}" >> .env
       # Step 5: Run the container (if GPU is required, you can add optional GPU support here)
