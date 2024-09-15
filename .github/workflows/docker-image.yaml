@@ -46,4 +46,4 @@ jobs:
           -e ALPACA_API_SECRET=${ALPACA_API_SECRET} \
           -e ALPACA_API_BASE_URL=${ALPACA_API_BASE_URL} \
           -e ALPACA_PAPER=${ALPACA_PAPER} \
-          -p 8501:8501 -v $(pwd):/app ai_trader /bin/sh -c "cd /app && python main.py"
+          -p 8501:8501 -v $(pwd):/app -d ai_trader /bin/sh -c "cd /app && python main.py"
