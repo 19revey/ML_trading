@@ -1,10 +1,10 @@
 artifacts_root: artifacts
 
 data:
-  tic_list: ['SPY', 'XOP','AAPL','NVDA']
-  interval: 1Min
-  start_date: 2024-09-01
-  end_date: 2024-09-12
+  tic_list: ['SPY']
+  interval: 1Day
+  start_date: 2022-01-01
+  end_date: 2022-12-31
   save_raw_data: True
   save_processed_data: True
   save_stream_data: True
@@ -15,8 +15,8 @@ data:
 
 model:
   model_file: artifacts/trained_model/model.zip
-  lookback: 2
-  time_steps: 1000
+  lookback: 30
+  time_steps: 100000
   
 
 
