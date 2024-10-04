@@ -1,24 +1,20 @@
 # ML-based Trading bot
 
+- Trade SPY at daily or minute intervals with the goal of outperforming the buy-and-hold strategy.
 
-## Trading algorithms:
+- Trading algorithms: PPO 
 
-- PPO
+- Deployment: CI/CD pipeline implemented with GitHub Actions on a self-hosted runner (RTX 3090).
 
-## Deployment
-
-- CI/CD using GitHub Action on a self-host runner with RTX 1080Ti
-
-
-## Performance
-
-- Lookback window size
-- Indicators
-- Training data period
-- Trading intervals
+- Key performance factors:
+    - Lookback window size
+    - Indicators
+    - Training data period
+    - Trading intervals
 
 
-### Train on SPY data with 30 days lookback window
+
+### Trained with 30-day lookback window
 |  | Buy&Hold     | Max possible     | RL optimized     | Profit increase|
 |--------------|--------------|--------------|--------------|--------------|
 | **Train** (2023-01-01 to 2023-12-31)| 1.16| 1.99| 1.42|  **22%**|
