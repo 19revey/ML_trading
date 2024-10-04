@@ -2,7 +2,6 @@
 logs/
 __pycache__/
 notebook/
-*png
 template.py
 *env
 *egg-info
